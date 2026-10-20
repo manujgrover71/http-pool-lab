@@ -1,6 +1,6 @@
 # http-pool-lab
 
-The experiments behind *Go's HTTP Client Keeps Two Connections*.
+The experiments behind *Go's HTTP Client Doesn't Queue, It Dials*.
 
 `http.DefaultTransport` has no cap on open connections per host, but keeps only two of them
 idle (`MaxIdleConnsPerHost`). Above two requests in flight to one host, the extra connections

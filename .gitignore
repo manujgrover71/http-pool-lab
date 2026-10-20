@@ -1,0 +1,11 @@
+/lab
+/server
+results/*
+!results/summary.md
+tls/*.pem
+tls/*.key
+tls/*.crt
+
+.idea/
+.vscode/
+.DS_Store

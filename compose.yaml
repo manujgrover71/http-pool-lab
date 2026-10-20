@@ -1,0 +1,30 @@
+# Each side gets its own cgroup and network namespace, so CPU, throttling and TIME_WAIT are
+# counted per side. The caller's CLIENT_CPUS is a CFS quota, the same mechanism as an ECS
+# task's cpu. Set GOMAXPROCS to see what a Go older than 1.25, which ignored that limit, does.
+services:
+  server:
+    build: .
+    command: ["server"]
+    cpus: ${SERVER_CPUS:-4}
+    volumes:
+      - ./tls:/tls:ro
+    ulimits:
+      nofile: 65536
+
+  lab:
+    build: .
+    profiles: [lab]
+    entrypoint: ["lab", "-out", "/results"]
+    cpus: ${CLIENT_CPUS:-1}
+    environment:
+      GOMAXPROCS: ${GOMAXPROCS:-}
+    # Kernel defaults unless overridden, e.g. TW_REUSE=1 or PORT_RANGE="1024 65535".
+    sysctls:
+      net.ipv4.ip_local_port_range: ${PORT_RANGE:-32768 60999}
+      net.ipv4.tcp_tw_reuse: ${TW_REUSE:-2}
+    volumes:
+      - ./tls:/tls:ro
+      - ./results:/results
+    depends_on: [server]
+    ulimits:
+      nofile: 65536
